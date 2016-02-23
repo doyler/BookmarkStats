@@ -12,6 +12,7 @@ A python application to get statistics from a browser bookmark export
 * Organize and straighten methods
 * General code cleanup
 * Add support for more browsers
+* Show in which folders the dupes actuall reside
 * Add generic case (maybe just total links and don't do visual stuff)
 * Add sorting options (based on count, etc.)
 * Add timeout checking (HEAD request)
