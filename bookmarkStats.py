@@ -11,17 +11,22 @@ def createSoup(browser):
 
 def headerList(browser, theSoup, linkList):
     headerList = theSoup.findAll('h3')
-    headerList.pop(0) # Remove "Bookmarks Toolbar"
+    
+    if browser == "chrome" or browser == "firefox":
+        headerList.pop(0) # Remove "Bookmarks Toolbar"
 
     for node in headerList:
         header = ''.join(node.findAll(text=True))
         s = node
         while getattr(s, 'name', None) != 'dl':
-            if browser == "chrome":
+            if browser == "chrome" or browser == "ie11":
                 s = s.nextSibling
             elif browser == "firefox":
                 s = s.findNext('dl')
-        parents = len(node.findParents('dl')) - 2
+        if browser == "chrome" or browser == "firefox":
+            parents = len(node.findParents('dl')) - 2
+        elif browser == "ie11":
+            parents = len(node.findParents('dl')) - 1
         count = len(s.findAll('a'))
         percentage = "{0:.2f}%".format(((count + 0.0)/len(linkList)) * 100)
         prepend = (parents * "\t")
@@ -47,7 +52,7 @@ def getDupes(inList):
     return [item for item, c in collections.Counter(inList).items() if c > 1]
         
 def main():
-    browser = "firefox"
+    browser = "ie11"
     
     mySoup = createSoup(browser)
     linkList = mySoup.find_all('a')
@@ -75,13 +80,16 @@ def main():
     print "------------------------------------"
     for dupe in dupes:
         print dupe
-        
+
+    """
+    # Maybe remove? This isn't super useful, and hasn't caught any actual dupes    
     urlList = populateList(linkList, "noQueryString")    
     dupes = getDupes(urlList)
     print "\nDUPLICATE LINKS (IGNORING QUERYSTRING) = " + str(len(dupes))
     print "---------------------------------------"
     for dupe in dupes:
         print dupe
+    """
         
 if __name__=="__main__":
 	main()
