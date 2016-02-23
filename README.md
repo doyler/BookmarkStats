@@ -6,9 +6,9 @@ A python application to get statistics from a browser bookmark export
 * Counts all bookmarks in folders and sub-folders
 * Calculates percentage of bookmarks in each folder/sub-folder
 * Visually nests (tabs) sub-folders
+* Counts duplicates (and possible duplicates) based on matching links, matching ignoring protocol, and matching ignoring querystring
 
 # TODO
 * Add sorting options (based on count, etc.)
 * Add support for multiple browsers
-* Add duplicate checking (same ignoring protocol, same ignoring querystring, almost the same)
 * Add timeout checking (HEAD request)
