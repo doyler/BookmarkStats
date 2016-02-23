@@ -9,7 +9,8 @@ A python application to get statistics from a browser bookmark export
 * Counts duplicates (and possible duplicates) based on matching links, matching ignoring protocol, and matching ignoring querystring
 
 # TODO
-* Add methods and clean up code
+* Organize and straighten methods
+* General code cleanup
 * Add support for more browsers
 * Add generic case (maybe just total links and don't do visual stuff)
 * Add sorting options (based on count, etc.)
