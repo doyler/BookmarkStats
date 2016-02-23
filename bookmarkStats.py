@@ -18,5 +18,8 @@ for node in headerList:
     s = node
     while getattr(s, 'name', None) != 'dl':
         s = s.nextSibling
+    parents = len(node.findParents('dl')) - 2
     count = len(s.findAll('a'))
-    print header + " - " + str(count) + " = " + "{0:.2f}%".format(((count + 0.0)/total) * 100)
+    percentage = "{0:.2f}%".format(((count + 0.0)/total) * 100)
+    prepend = (parents * "\t")
+    print  prepend + header + " - " + str(count) + " = " + percentage
