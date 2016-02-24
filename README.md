@@ -1,12 +1,16 @@
 # BookmarkStats
-A python application to get statistics from a browser bookmark export
+A python application to get statistics from a browser (Chrome, Firefox, and IE are currently supported) bookmark export
 
 # Features
 * Counts all bookmarks in a browser bookmark HTML export
 * Counts all bookmarks in folders and sub-folders
 * Calculates percentage of bookmarks in each folder/sub-folder
 * Visually nests (tabs) sub-folders
-* Counts duplicates (and possible duplicates) based on matching links, matching ignoring protocol, and matching ignoring querystring
+
+![Visual Nesting](http://i.imgur.com/NJRf2gc.png)
+* Counts duplicates (and possible duplicates) based on exact matching links or matching links ignoring protocol
+
+![Dupe Checking](http://i.imgur.com/ahhInze.png)
 * Cross browser support (tested in the newest versions of Chrome, Firefox, and IE11)
 * Generic case (just calculates total links without visualization or folder break down) for unsupported browsers
 
