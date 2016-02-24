@@ -7,10 +7,10 @@ A python application to get statistics from a browser (Chrome, Firefox, and IE a
 * Calculates percentage of bookmarks in each folder/sub-folder
 * Visually nests (tabs) sub-folders
 
-![Visual Nesting](http://i.imgur.com/NJRf2gc.png)
+![Visual Nesting](http://i.imgur.com/BSdfJr2.png)
 * Counts duplicates (and possible duplicates) based on exact matching links or matching links ignoring protocol
 
-![Dupe Checking](http://i.imgur.com/ahhInze.png)
+![Dupe Checking](http://i.imgur.com/Qo7kTo3.png)
 * Cross browser support (tested in the newest versions of Chrome, Firefox, and IE11)
 * Generic case (just calculates total links without visualization or folder break down) for unsupported browsers
 
