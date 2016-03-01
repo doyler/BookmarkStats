@@ -1,4 +1,5 @@
 import collections
+import requests
 
 from bs4 import BeautifulSoup
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
@@ -53,6 +54,10 @@ def populateList(linkList, urlType):
 
 def getDupes(inList):        
     return [item for item, c in collections.Counter(inList).items() if c > 1]
+    
+def checkStatus(link):
+    resp = requests.head(link)
+    return resp
         
 def main():
     supportedBrowsers = ["chrome", "firefox", "ie"]
@@ -95,6 +100,16 @@ def main():
         for dupe in dupes:
             print dupe
         """
+
+    print "\nERROR CONNECTS"
+    print "---------------"    
+    for link in linkList:
+        try:
+            response = checkStatus(link['href'])
+        except:
+            print "ERROR?!"
+        if response.status_code != 200:
+            print str(response.status_code) + " - " + link['href']
         
 if __name__=="__main__":
 	main()
