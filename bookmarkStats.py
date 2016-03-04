@@ -1,4 +1,5 @@
 import collections
+import cProfile
 import re
 import requests
 
@@ -138,6 +139,8 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         next(iterTree) # Remove "Bookmarks Toolbar" or "Bookmarks"
         removed += 1
         
+    #outBuffer = ""
+    
     for node in iterTree:
         temp = node
         parents = 0
@@ -148,10 +151,17 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         links = getLinks(browser, theSoup, node.identifier)
         count = len(links)
         percentage = "{0:.2f}%".format(((count + 0.0)/len(linkList)) * 100)
+        #outBuffer += (prepend + str(node.identifier) + " - " + str(count) + " = " + percentage)
         print prepend + str(node.identifier) + " - " + str(count) + " = " + percentage
-    
+    #print outBuffer
+        
 def getLinks(browser, theSoup, header):
-    s = theSoup.find('h3', text = header)
+    s = None
+    headerNodes = theSoup.findAll('h3')
+    for node in headerNodes:
+        if node.text == header:
+            s = node
+            break
     while getattr(s, 'name', None) != 'dl':
         if browser == "chrome" or browser == "ie":
             s = s.nextSibling
@@ -176,7 +186,7 @@ def getDupes(inList):
 def checkStatus(link):
     resp = requests.head(link)
     return resp
-        
+
 def main():
     supportedBrowsers = ["chrome", "firefox", "ie"]
     browser = "chrome"
@@ -222,7 +232,6 @@ def main():
         if response.status_code != 200:
             print str(response.status_code) + " - " + link['href']
     """
-
         
 if __name__=="__main__":
 	main()
