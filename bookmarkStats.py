@@ -2,16 +2,13 @@ import collections
 import requests
 
 from bs4 import BeautifulSoup
-# http://www.crummy.com/software/BeautifulSoup/bs4/doc/
-
 
 # http://www.quesucede.com/page/show/id/python-3-tree-implementation
-(_ROOT, _DEPTH, _BREADTH) = range(3)
-
 class Node:
-    def __init__(self, identifier):
+    def __init__(self, identifier, parent=None):
         self.__identifier = identifier
         self.__children = []
+        self.__parent = parent
 
     @property
     def identifier(self):
@@ -20,6 +17,10 @@ class Node:
     @property
     def children(self):
         return self.__children
+        
+    @property
+    def parent(self):
+        return self.__parent
 
     def add_child(self, identifier):
         self.__children.append(identifier)
@@ -33,7 +34,10 @@ class Tree:
         return self.__nodes
 
     def add_node(self, identifier, parent=None):
-        node = Node(identifier)
+        if parent is not None:
+            node = Node(identifier, self.__nodes[parent])
+        else:
+            node = Node(identifier)
         self[identifier] = node
 
         if parent is not None:
@@ -41,9 +45,9 @@ class Tree:
 
         return node
 
-    def display(self, identifier, depth=_ROOT):
+    def display(self, identifier, depth=0):
         children = self[identifier].children
-        if depth == _ROOT:
+        if depth == 0:
             print identifier
         else:
             print "\t" * depth + str(identifier)
@@ -52,19 +56,19 @@ class Tree:
         for child in children:
             self.display(child, depth)  # recursive call
 
-    def traverse(self, identifier, mode=_DEPTH):
+    def traverse(self, identifier, mode="depth"):
         # Python generator. Loosly based on an algorithm from 
         # 'Essential LISP' by John R. Anderson, Albert T. Corbett, 
         # and Brian J. Reiser, page 239-241
-        yield identifier
+        yield self.__nodes[identifier]
         queue = self[identifier].children
         while queue:
-            yield queue[0]
+            yield self.__nodes[queue[0]]
             expansion = self[queue[0]].children
-            if mode == _DEPTH:
-                queue = expansion + queue[1:]  # depth-first
-            elif mode == _BREADTH:
-                queue = queue[1:] + expansion  # width-first
+            if mode == "depth":
+                queue = expansion + queue[1:]  # dfs
+            elif mode == "breadth":
+                queue = queue[1:] + expansion  # bfs
 
     def __getitem__(self, key):
         return self.__nodes[key]
@@ -110,23 +114,35 @@ def genHeaderTree(browser, theSoup):
 
 def printHeaderList(browser, theTree, theSoup, linkList):
     headerList = theSoup.findAll('h3')
+    firstHeader = ''.join(headerList[0].findAll(text=True))
     
+    iterTree = theTree.traverse(firstHeader, "depth")
+
+    removed = 0    
     if browser == "chrome" or browser == "firefox":
-        headerList.pop(0) # Remove "Bookmarks Toolbar"
-
-    for node in headerList:
-        header = ''.join(node.findAll(text=True))
-        s = node
-        while getattr(s, 'name', None) != 'dl':
-            if browser == "chrome" or browser == "ie":
-                s = s.nextSibling
-            elif browser == "firefox":
-                s = s.findNext('dl')
-        count = len(s.findAll('a'))
+        next(iterTree) # Remove "Bookmarks Toolbar"
+        removed += 1
+        
+    for node in iterTree:
+        temp = node
+        parents = 0
+        while temp.parent:
+            parents += 1
+            temp = temp.parent
+        prepend = "\t" * (parents - removed)
+        links = getLinks(browser, theSoup, node.identifier)
+        count = len(links)
         percentage = "{0:.2f}%".format(((count + 0.0)/len(linkList)) * 100)
-
-    theTree.display("Bookmarks bar")
-    #print header + " - " + str(count) + " = " + percentage
+        print prepend + str(node.identifier) + " - " + str(count) + " = " + percentage
+    
+def getLinks(browser, theSoup, header):
+    s = theSoup.find('h3', text = header)
+    while getattr(s, 'name', None) != 'dl':
+        if browser == "chrome" or browser == "ie":
+            s = s.nextSibling
+        elif browser == "firefox":
+            s = s.findNext('dl')
+    return s.findAll('a')
 
 def populateList(linkList, urlType):
     urlList = []
@@ -165,12 +181,6 @@ def main():
     
     if any(browser in s for s in supportedBrowsers):
         printHeaderList(browser, myTree, mySoup, linkList)
-    
-        """
-        print("\n --DFS-- \n"")
-        for node in myTree.traverse("Bookmarks bar"):
-            print(node)
-        """
 
         urlList = populateList(linkList, "normal")    
         dupes = getDupes(urlList)
