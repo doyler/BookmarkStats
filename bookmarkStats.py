@@ -1,4 +1,5 @@
 import collections
+import re
 import requests
 
 from bs4 import BeautifulSoup
@@ -96,31 +97,45 @@ def getChildren(theNode, level):
     return children
     
 def genHeaderTree(browser, theSoup):
-    headerList = theSoup.findAll('h3')
+    iterSoup = theSoup.findAll('dl')
+    
+    if browser == "chrome" or browser == "firefox": 
+        headerList = theSoup.findAll('h3')
+        iterSoup = iterSoup[1:]
+    else:
+        headerList = theSoup.findAll(re.compile("h?"))
+    
     firstHeader = str(headerList[0].text)
-
+    
     headerTree = Tree()
     headerTree.add_node(firstHeader)
     
-    for item in theSoup.findAll('dl')[1:]:
+    for item in iterSoup:
         parents = len(item.findParents('dl'))
         children = getChildren(item, parents)
         #print children
         if children:
             for child in children:
-                #print child + " - " + str(item.findPrevious('h3').text)
-                headerTree.add_node(child, str(item.findPrevious('h3').text))
+                #print child + " - " + str(item.findPrevious(re.compile("h?")).text)
+                if browser == "chrome" or browser == "firefox":
+                    headerTree.add_node(child, str(item.findPrevious('h3').text))
+                else:
+                    headerTree.add_node(child, str(item.findPrevious(re.compile("h?")).text))
     return headerTree
 
 def printHeaderList(browser, theTree, theSoup, linkList):
-    headerList = theSoup.findAll('h3')
+    if browser == "chrome" or browser == "firefox": 
+        headerList = theSoup.findAll('h3')
+    else:
+        headerList = theSoup.findAll(re.compile("h?"))    
+    
     firstHeader = ''.join(headerList[0].findAll(text=True))
     
     iterTree = theTree.traverse(firstHeader, "depth")
-
+    
     removed = 0    
-    if browser == "chrome" or browser == "firefox":
-        next(iterTree) # Remove "Bookmarks Toolbar"
+    if browser == "chrome" or browser == "firefox" or browser == "ie":
+        next(iterTree) # Remove "Bookmarks Toolbar" or "Bookmarks"
         removed += 1
         
     for node in iterTree:
@@ -163,7 +178,7 @@ def checkStatus(link):
     return resp
         
 def main():
-    supportedBrowsers = ["chrome", "firefox"]#, "ie"]
+    supportedBrowsers = ["chrome", "firefox", "ie"]
     browser = "chrome"
     
     mySoup = createSoup(browser)
