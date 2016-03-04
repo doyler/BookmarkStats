@@ -21,3 +21,4 @@ A python application to get statistics from a browser (Chrome, Firefox, and IE a
 * Add sorting options (based on count, etc.)
 * Add timeout checking (HEAD request)
 * Look into visual representations (pie chart?)
+* Add support (recently broken) for duplicate folder names, or at least checking/combining
