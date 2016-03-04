@@ -94,7 +94,6 @@ def getChildren(theNode, level):
         header = child.findPrevious('h3')
         if parents == level + 1:
             children.append(str(''.join(header.findAll(text=True))))
-            #children.append(child)
     return children
     
 def genHeaderTree(browser, theSoup):
@@ -114,14 +113,13 @@ def genHeaderTree(browser, theSoup):
     for item in iterSoup:
         parents = len(item.findParents('dl'))
         children = getChildren(item, parents)
-        #print children
         if children:
             for child in children:
-                #print child + " - " + str(item.findPrevious(re.compile("h?")).text)
                 if browser == "chrome" or browser == "firefox":
-                    headerTree.add_node(child, str(item.findPrevious('h3').text))
+                    parent = str(item.findPrevious('h3').text)
                 else:
-                    headerTree.add_node(child, str(item.findPrevious(re.compile("h?")).text))
+                    parent = str(item.findPrevious(re.compile("h?")).text)
+                headerTree.add_node(child, parent)
     return headerTree
 
 def printHeaderList(browser, theTree, theSoup, linkList):
@@ -139,8 +137,6 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         next(iterTree) # Remove "Bookmarks Toolbar" or "Bookmarks"
         removed += 1
         
-    #outBuffer = ""
-    
     for node in iterTree:
         temp = node
         parents = 0
@@ -151,9 +147,8 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         links = getLinks(browser, theSoup, node.identifier)
         count = len(links)
         percentage = "{0:.2f}%".format(((count + 0.0)/len(linkList)) * 100)
-        #outBuffer += (prepend + str(node.identifier) + " - " + str(count) + " = " + percentage)
-        print prepend + str(node.identifier) + " - " + str(count) + " = " + percentage
-    #print outBuffer
+        print (prepend + str(node.identifier) + " - " + 
+            str(count) + " = " +percentage)
 
 def getLinks(browser, theSoup, header):
     s = None
