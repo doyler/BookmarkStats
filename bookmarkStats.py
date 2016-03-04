@@ -154,14 +154,16 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         #outBuffer += (prepend + str(node.identifier) + " - " + str(count) + " = " + percentage)
         print prepend + str(node.identifier) + " - " + str(count) + " = " + percentage
     #print outBuffer
-        
+
 def getLinks(browser, theSoup, header):
     s = None
+    # Total time: 2.00404 s - slowest part of the code
     headerNodes = theSoup.findAll('h3')
     for node in headerNodes:
         if node.text == header:
             s = node
             break
+    
     while getattr(s, 'name', None) != 'dl':
         if browser == "chrome" or browser == "ie":
             s = s.nextSibling
@@ -191,6 +193,10 @@ def main():
     supportedBrowsers = ["chrome", "firefox", "ie"]
     browser = "chrome"
     
+    getCount = True
+    checkDupes = True
+    checkErrors = False
+    
     mySoup = createSoup(browser)
     linkList = mySoup.find_all('a')
     
@@ -201,37 +207,38 @@ def main():
             
     myTree = genHeaderTree(browser, mySoup)
     
-    total = len(linkList)
-    print "Total number of bookmarks: " + str(total) + "\n"
-    
-    if any(browser in s for s in supportedBrowsers):
-        printHeaderList(browser, myTree, mySoup, linkList)
+    if getCount:
+        total = len(linkList)
+        print "Total number of bookmarks: " + str(total) + "\n"
 
-        urlList = populateList(linkList, "normal")    
-        dupes = getDupes(urlList)
-        print "\n\nDUPLICATE LINKS = " + str(len(dupes))
-        print "----------------"
-        for dupe in dupes:
-            print dupe
+    if checkDupes:    
+        if any(browser in s for s in supportedBrowsers):
+            printHeaderList(browser, myTree, mySoup, linkList)
+
+            urlList = populateList(linkList, "normal")    
+            dupes = getDupes(urlList)
+            print "\n\nDUPLICATE LINKS = " + str(len(dupes))
+            print "----------------"
+            for dupe in dupes:
+                print dupe
         
-        urlList = populateList(linkList, "noProtocol")    
-        dupes = getDupes(urlList)    
-        print "\nDUPLICATE LINKS (IGNORING PROTOCOL) = " + str(len(dupes))
-        print "------------------------------------"
-        for dupe in dupes:
-            print dupe
+            urlList = populateList(linkList, "noProtocol")    
+            dupes = getDupes(urlList)    
+            print "\nDUPLICATE LINKS (IGNORING PROTOCOL) = " + str(len(dupes))
+            print "------------------------------------"
+            for dupe in dupes:
+                print dupe
     
-    """
-    print "\nERROR CONNECTS"
-    print "---------------"    
-    for link in linkList:
-        try:
-            response = checkStatus(link['href'])
-        except:
-            print "ERROR?!"
-        if response.status_code != 200:
-            print str(response.status_code) + " - " + link['href']
-    """
+    if checkErrors:
+        print "\nERROR CONNECTS"
+        print "---------------"    
+        for link in linkList:
+            try:
+                response = checkStatus(link['href'])
+            except:
+                print "ERROR?!"
+            if response.status_code != 200:
+                print str(response.status_code) + " - " + link['href']
         
 if __name__=="__main__":
 	main()
