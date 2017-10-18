@@ -1,5 +1,6 @@
 import collections
 import cProfile
+import os
 import re
 import requests
 
@@ -80,7 +81,9 @@ class Tree:
 
 
 def createSoup(browser):
-    with open ("./bookmarks_" + browser + ".html", "r") as myfile:
+    # https://stackoverflow.com/questions/4060221
+    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    with open(os.path.join(__location__, "bookmarks_" + browser + ".html"), "r") as myfile:
         html = myfile.read()
     soup = BeautifulSoup(html, 'html.parser')
     return soup
