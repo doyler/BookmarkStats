@@ -51,9 +51,9 @@ class Tree:
     def display(self, identifier, depth=0):
         children = self[identifier].children
         if depth == 0:
-            print identifier
+            print(identifier)
         else:
-            print "\t" * depth + str(identifier)
+            print("\t" * depth + str(identifier))
 
         depth += 1
         for child in children:
@@ -83,7 +83,7 @@ class Tree:
 def createSoup(browser):
     # https://stackoverflow.com/questions/4060221
     __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    with open(os.path.join(__location__, "bookmarks_" + browser + ".html"), "r") as myfile:
+    with open(os.path.join(__location__, "bookmarks_" + browser + ".html"), "r", encoding="utf8") as myfile:
         html = myfile.read()
     soup = BeautifulSoup(html, 'html.parser')
     return soup
@@ -150,8 +150,8 @@ def printHeaderList(browser, theTree, theSoup, linkList):
         links = getLinks(browser, theSoup, node.identifier)
         count = len(links)
         percentage = "{0:.2f}%".format(((count + 0.0)/len(linkList)) * 100)
-        print (prepend + str(node.identifier) + " - " + 
-            str(count) + " = " +percentage)
+        print((prepend + str(node.identifier) + " - " + 
+            str(count) + " = " +percentage))
 
 def getLinks(browser, theSoup, header):
     s = None
@@ -181,7 +181,7 @@ def populateList(linkList, urlType):
     return urlList
 
 def getDupes(inList):        
-    return [item for item, c in collections.Counter(inList).items() if c > 1]
+    return [item for item, c in list(collections.Counter(inList).items()) if c > 1]
     
 def checkStatus(link):
     resp = requests.head(link)
@@ -207,7 +207,7 @@ def main():
     
     if getCount:
         total = len(linkList)
-        print "Total number of bookmarks: " + str(total) + "\n"
+        print("Total number of bookmarks: " + str(total) + "\n")
 
     if checkDupes:    
         if any(browser in s for s in supportedBrowsers):
@@ -215,28 +215,28 @@ def main():
 
             urlList = populateList(linkList, "normal")    
             dupes = getDupes(urlList)
-            print "\n\nDUPLICATE LINKS = " + str(len(dupes))
-            print "----------------"
+            print("\n\nDUPLICATE LINKS = " + str(len(dupes)))
+            print("----------------")
             for dupe in dupes:
-                print dupe
+                print(dupe)
         
             urlList = populateList(linkList, "noProtocol")    
             dupes = getDupes(urlList)    
-            print "\nDUPLICATE LINKS (IGNORING PROTOCOL) = " + str(len(dupes))
-            print "------------------------------------"
+            print("\nDUPLICATE LINKS (IGNORING PROTOCOL) = " + str(len(dupes)))
+            print("------------------------------------")
             for dupe in dupes:
-                print dupe
+                print(dupe)
     
     if checkErrors:
-        print "\nERROR CONNECTS"
-        print "---------------"    
+        print("\nERROR CONNECTS")
+        print("---------------"    )
         for link in linkList:
             try:
                 response = checkStatus(link['href'])
             except:
-                print "ERROR?!"
+                print("ERROR?!")
             if response.status_code != 200:
-                print str(response.status_code) + " - " + link['href']
+                print(str(response.status_code) + " - " + link['href'])
         
 if __name__=="__main__":
 	main()
